@@ -1,0 +1,17 @@
+f:\desktop\code\visual studio 2010\Projects\WindowsFormsApplication3\WindowsFormsApplication3\bin\Debug\WindowsFormsApplication3.exe
+f:\desktop\code\visual studio 2010\Projects\WindowsFormsApplication3\WindowsFormsApplication3\bin\Debug\WindowsFormsApplication3.pdb
+f:\desktop\code\visual studio 2010\Projects\WindowsFormsApplication3\WindowsFormsApplication3\obj\x86\Debug\WindowsFormsApplication3.Properties.Resources.resources
+f:\desktop\code\visual studio 2010\Projects\WindowsFormsApplication3\WindowsFormsApplication3\obj\x86\Debug\GroupChat.csproj.GenerateResource.Cache
+f:\desktop\code\visual studio 2010\Projects\WindowsFormsApplication3\WindowsFormsApplication3\obj\x86\Debug\WindowsFormsApplication3.exe
+f:\desktop\code\visual studio 2010\Projects\WindowsFormsApplication3\WindowsFormsApplication3\obj\x86\Debug\WindowsFormsApplication3.pdb
+f:\desktop\code\visual studio 2010\Projects\WindowsFormsApplication3\WindowsFormsApplication3\obj\x86\Debug\WindowsFormsApplication3.Transmission.resources
+f:\desktop\code\visual studio 2010\Projects\WindowsFormsApplication3\WindowsFormsApplication3\obj\x86\Debug\GroupChat.ChatRoom.resources
+F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\bin\Debug\GroupChat.exe
+F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\bin\Debug\GroupChat.pdb
+F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.Transmission.resources
+F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.Properties.Resources.resources
+F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.csproj.GenerateResource.Cache
+F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.exe
+F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.pdb
+F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.csprojResolveAssemblyReference.cache
+F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.ChatRoom.resources
