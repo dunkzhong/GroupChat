@@ -48,13 +48,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Broadcast.cs" />
     <Compile Include="ChatRoom.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ChatRoom.Designer.cs">
       <DependentUpon>ChatRoom.cs</DependentUpon>
     </Compile>
+    <Compile Include="ListenClass.cs" />
     <Compile Include="ReceiveFileClass.cs" />
+    <Compile Include="SendFileClass.cs" />
     <Compile Include="UdpSendMessage.cs" />
     <Compile Include="Win32API.cs" />
     <Compile Include="Transmission.cs">

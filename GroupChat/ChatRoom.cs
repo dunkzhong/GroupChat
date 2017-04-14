@@ -24,7 +24,7 @@ namespace GroupChat
 
     public partial class ChatRoom : Form
     {
-        public static readonly int BROADCAST_INTERVAL = 10000;
+        
         public static readonly int UDP_DATA_MAX_SIZE = 1024;
         public static readonly int TCP_DATA_MAX_SIZE = 10 * 1024 * 1024;
         public static readonly int TCP_LISTEN_MAX_SIZE = 1024;
@@ -58,6 +58,11 @@ namespace GroupChat
 
         private static Socket sendFileSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private static IPEndPoint tcpPoint = new IPEndPoint(IPAddress.Parse(IP_ADDRESS), FILE_PORT);
+
+        public static Socket fileAcceptSocket()
+        {
+            return sendFileSocket.Accept();
+        }
 
         private ChatRoom()
         {
@@ -253,159 +258,16 @@ namespace GroupChat
 
         private void ControlMessage()
         {
-            Thread listenThread = new Thread(new ThreadStart(StartListen));
+            Thread listenThread = new Thread(new ThreadStart(ListenClass.StartListen));
             listenThread.IsBackground = true;
             listenThread.Start();
-        }
-
-        /**
-         *  Broadcast:cpname+ip
-         *  BroadcastReply:cpname+ip
-         *  ChatMessage:cpname+ip+data
-         *  FileMessage:cpname+ip+path+size
-         *  FileRequest:ip+path+size
-         *  FileRequestReply:ip+path+size
-         */
-        private void StartListen()
-        {
-            UdpClient udpClient = new UdpClient(LISTEN_PORT);
-            IPEndPoint ipEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            IntPtr charRoom = Win32API.FindWindow(null, WINDOWS_NAME);
-
-            while (true)
-            {
-                byte[] buff = udpClient.Receive(ref ipEndPoint);
-                string tmpInfo = Encoding.Default.GetString(buff);
-
-                string[] infos = tmpInfo.Split(SEPARATOR);
-                MessageType messageType = (MessageType)Enum.Parse(typeof(MessageType), infos[0]);
-
-                switch (messageType)
-                {
-                    case MessageType.Broadcast:
-                        {
-                            string computerName = infos[1];
-                            string ipAddress = infos[2];
-                            Win32API.My_lParam lp = new Win32API.My_lParam();
-                            lp.s = string.Join(SEPARATOR + "", new string[] { computerName, ipAddress });
-                            Win32API.SendMessage(charRoom, (int)MessageType.Broadcast, 0, ref lp);
-                            string myInfo = string.Join(SEPARATOR + "", new string[] { MessageType.BroadcastReply + "", COMPUTER_NAME, IP_ADDRESS });
-                            UdpSendMessage.SendToOne(ipAddress, myInfo);
-                        }
-                        break;
-
-                    case MessageType.BroadcastReply:
-                        {
-                            string computerName = infos[1];
-                            string ipAddress = infos[2];
-                            Win32API.My_lParam lp = new Win32API.My_lParam();
-                            lp.s = string.Join(SEPARATOR + "", new string[] { computerName, ipAddress });
-                            Win32API.SendMessage(charRoom, (int)MessageType.BroadcastReply, 0, ref lp);
-                        }
-                        break;
-
-                    case MessageType.ChatMessage:
-                        {
-                            string computerName = infos[1];
-                            string ipAddress = infos[2];
-                            string chatData = infos[3];
-                            Win32API.My_lParam lp = new Win32API.My_lParam();
-                            lp.s = string.Join(SEPARATOR + "", new string[] { computerName, ipAddress, chatData });
-                            Win32API.SendMessage(charRoom, (int)MessageType.ChatMessage, 0, ref lp);
-                        }
-                        break;
-
-                    case MessageType.FileMessage:
-                        {
-                            string computerName = infos[1];
-                            string ipAddress = infos[2];
-                            string filePath = infos[3];
-                            string fileSize = infos[4];
-                            Win32API.My_lParam lp = new Win32API.My_lParam();
-                            lp.s = string.Join(SEPARATOR + "", new string[] { computerName, ipAddress, filePath, fileSize });
-                            Win32API.SendMessage(charRoom, (int)MessageType.FileMessage, 0, ref lp);
-                        }
-                        break;
-
-                    case MessageType.FileRequest:
-                        {
-                            string ipAddress = infos[1];
-                            string filePath = infos[2];
-                            string fileSize = infos[3];
-                            if (File.Exists(filePath))
-                            {
-                                Thread sendFileThread = new Thread(new ParameterizedThreadStart(SendFile));
-                                sendFileThread.Start(filePath);
-                            }
-                            else
-                            {
-                                fileSize = "0";
-                            }
-
-                            string myInfo = string.Join(SEPARATOR + "", new string[] { MessageType.FileRequestReply + "", IP_ADDRESS, filePath, fileSize });
-                            UdpSendMessage.SendToOne(ipAddress, myInfo);
-                        }
-                        break;
-
-                    case MessageType.FileRequestReply:
-                        {
-                            string ipAddress = infos[1];
-                            string filePath = infos[2];
-                            string fileSize = infos[3];
-                            if (fileSize == "0")
-                            {
-                                MessageBox.Show("文件(" + filePath + ")已不存在，无法传输");
-                            }
-                            else
-                            {
-                                Win32API.My_lParam lp = new Win32API.My_lParam();
-                                lp.s = string.Join(SEPARATOR + "", new string[] { ipAddress, filePath, fileSize });
-                                Win32API.SendMessage(charRoom, (int)MessageType.FileRequestReply, 0, ref lp);
-                            }
-                        }
-                        break;
-
-                    default:
-
-                        break;
-                }
-            }
-        }
-
-        private void SendFile(object filePath)
-        {
-            int len = 0;
-            byte[] buff = new byte[TCP_DATA_MAX_SIZE];
-            string sendFilePath = (string)filePath;
-            Socket sendFileAccept = sendFileSocket.Accept();
-            FileStream FS = new FileStream(sendFilePath, FileMode.Open, FileAccess.Read);
-
-            while ((len = FS.Read(buff, 0, TCP_DATA_MAX_SIZE)) != 0)
-            {
-                sendFileAccept.Send(buff, 0, len, SocketFlags.None);
-            }
-
-            sendFileAccept.Close();
-            FS.Close();
         }
 
         private void UpdateFriends()
         {
-            Thread listenThread = new Thread(new ThreadStart(IntervalBroadcast));
+            Thread listenThread = new Thread(new ThreadStart(Broadcast.IntervalBroadcast));
             listenThread.IsBackground = true;
             listenThread.Start();
-        }
-
-        private void IntervalBroadcast()
-        {
-            IntPtr charRoom = Win32API.FindWindow(null, "局域网群聊");
-            string info = string.Join(SEPARATOR+"",new string[]{MessageType.Broadcast+"",COMPUTER_NAME,IP_ADDRESS});
-            while (true)
-            {
-                Win32API.SendMessage(charRoom,(int)MessageType.ClearUsers,0,0);
-                UdpSendMessage.SendToAll(info);
-                Thread.Sleep(BROADCAST_INTERVAL);
-            }
         }
 
         private void btn_send_Click(object sender, EventArgs e)
@@ -445,7 +307,6 @@ namespace GroupChat
 
         private void list_file_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            //MessageBox.Show(list_file.SelectedItems[0].SubItems[1].Text);
             if (list_file.SelectedItems.Count == 1)
             {
                 DialogResult result = MessageBox.Show("确定接收文件（"+list_file.SelectedItems[0].Text+"）吗？","tips",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
