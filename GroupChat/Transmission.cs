@@ -57,7 +57,7 @@ namespace GroupChat
             SaveFileDialog SFD = new SaveFileDialog();
             SFD.OverwritePrompt = true;
             SFD.RestoreDirectory = true;
-            SFD.Filter = type + " files(*." + type + ")|*." + type + "|All files(*.*)|*.*";
+            SFD.Filter = type + " files(*" + type + ")|*" + type + "|All files(*.*)|*.*";
             SFD.FileName = Path.GetFileName(this.filePath);
 
 

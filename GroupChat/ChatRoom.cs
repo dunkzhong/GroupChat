@@ -120,7 +120,7 @@ namespace GroupChat
                         string[] msg = ml.s.Split(SEPARATOR);
 
                         string owner = msg[0] + "(" + msg[1] + ")";
-                        string updateTime = DateTime.Now.ToLongTimeString();
+                        string updateTime = DateTime.Now+"";
                         string data = msg[2];
                         string str = owner;
                         str += updateTime + Environment.NewLine;
@@ -138,14 +138,14 @@ namespace GroupChat
 
                         string[] msg = ml.s.Split(SEPARATOR);
                         string owner = msg[0] + "(" + msg[1] + ")";
-                        string updateTime = DateTime.Now.ToLongTimeString();
+                        string updateTime = DateTime.Now+"";
                         string filePath = msg[2];
                         string fileSize = msg[3];
 
                         string str = owner;
                         str += updateTime + Environment.NewLine;
                         str += "发送文件：" + Path.GetFileName(filePath);
-                        str += " 大小(字节)：" + fileSize;
+                        str += "；大小(字节)：" + fileSize;
                         str += Environment.NewLine;
                         str += Environment.NewLine;
 
@@ -309,6 +309,14 @@ namespace GroupChat
         {
             if (list_file.SelectedItems.Count == 1)
             {
+                DateTime now = DateTime.Now;
+                DateTime fileCreateTime = Convert.ToDateTime(list_file.SelectedItems[0].SubItems[1].Text);
+                if((now-fileCreateTime).Minutes>=10)
+                {
+                    MessageBox.Show("文件已过期");
+                    list_file.Items.Remove(list_file.SelectedItems[0]);
+                    return;
+                }
                 DialogResult result = MessageBox.Show("确定接收文件（"+list_file.SelectedItems[0].Text+"）吗？","tips",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
