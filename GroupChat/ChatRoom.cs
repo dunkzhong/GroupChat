@@ -19,14 +19,15 @@ namespace GroupChat
     enum MessageType
     {
         WM_USER = 0x0400,//系统自定义消息0x0000~0x0400 
-        Broadcast, BroadcastReply, ChatMessage, FileMessage, FileRequest, FileRequestReply, ClearUsers, UpdateProgressBar, FileReceiveSuccess
+        Broadcast, BroadcastReply, ChatMessage, FileMessage, FileRequest, ClearUsers, UpdateProgressBar, FileReceiveSuccess, FileReceiveError
     }
 
     public partial class ChatRoom : Form
     {
-        
+
+        public static readonly int FILE_EXISTS_MINUTE = 10;
         public static readonly int UDP_DATA_MAX_SIZE = 1024;
-        public static readonly int TCP_DATA_MAX_SIZE = 10 * 1024 * 1024;
+        public static readonly int TCP_DATA_MAX_SIZE = 100 * 1024 * 1024;
         public static readonly int TCP_LISTEN_MAX_SIZE = 1024;
         public static readonly int LISTEN_PORT = 2048;
         public static readonly int FILE_PORT = 2049;
@@ -34,8 +35,8 @@ namespace GroupChat
         public static readonly string WINDOWS_NAME = "局域网群聊";
         public static readonly string COMPUTER_NAME = Dns.GetHostName();
         public static readonly string IP_ADDRESS = GetInternalIP();
-
-
+        public static readonly string DOWNLOAD_DIR = @".\Downloads";
+       
         //获取内网IP
         public static string GetInternalIP()
         {
@@ -67,8 +68,7 @@ namespace GroupChat
         private ChatRoom()
         {
             InitializeComponent();
-            sendFileSocket.Bind(tcpPoint);
-            sendFileSocket.Listen(TCP_LISTEN_MAX_SIZE);
+            SendFileClass.Initialize(sendFileSocket, tcpPoint);
         }
 
         public static ChatRoom GetRoom()
@@ -120,7 +120,7 @@ namespace GroupChat
                         string[] msg = ml.s.Split(SEPARATOR);
 
                         string owner = msg[0] + "(" + msg[1] + ")";
-                        string updateTime = DateTime.Now+"";
+                        string updateTime = DateTime.Now + "";
                         string data = msg[2];
                         string str = owner;
                         str += updateTime + Environment.NewLine;
@@ -138,7 +138,7 @@ namespace GroupChat
 
                         string[] msg = ml.s.Split(SEPARATOR);
                         string owner = msg[0] + "(" + msg[1] + ")";
-                        string updateTime = DateTime.Now+"";
+                        string updateTime = DateTime.Now + "";
                         string filePath = msg[2];
                         string fileSize = msg[3];
 
@@ -154,23 +154,41 @@ namespace GroupChat
                         updateFileList(filePath, updateTime, fileSize, msg[1]);
                     }
                     break;
-
-
-                case MessageType.FileRequestReply:
+                case MessageType.FileRequest:
                     {
                         Win32API.My_lParam ml = new Win32API.My_lParam();
                         Type t = ml.GetType();
                         ml = (Win32API.My_lParam)m.GetLParam(t);
-                        Transmission receiveFile = new Transmission(ml.s);
-                        receiveFile.Show();
+
+                        string filePath = ml.s;
+                        Socket sendFileAccept = ml.t;
+
+                        byte[] reply = new byte[TCP_DATA_MAX_SIZE];
+                        
+                        if (File.Exists(filePath))
+                        {
+                            reply = Encoding.Default.GetBytes("有效文件");
+                            sendFileAccept.Send(reply, SocketFlags.None);
+
+                            Thread sendFileThread = new Thread(new ParameterizedThreadStart(SendFileClass.SendFile));
+                            sendFileThread.IsBackground = true;
+                            sendFileThread.Start(ml);
+                        }
+                        else
+                        {
+                            reply = Encoding.Default.GetBytes("无效文件");
+                            sendFileAccept.Send(reply, SocketFlags.None);
+                            sendFileAccept.Close();
+                        }
                     }
                     break;
-
                 case MessageType.ClearUsers:
                     {
                         list_user.Items.Clear();
                         break;
                     }
+
+
 
                 default:
                     base.DefWndProc(ref m);
@@ -296,8 +314,15 @@ namespace GroupChat
             if (Dlg.ShowDialog() == DialogResult.OK)
             {
                 FI = new FileInfo(Dlg.FileName);
-                string info = string.Join(SEPARATOR + "", new string[] { MessageType.FileMessage + "", COMPUTER_NAME, IP_ADDRESS, Dlg.FileName, FI.Length + "" });
-                UdpSendMessage.SendToAll(info);
+                if (FI.Length == 0)
+                {
+                    MessageBox.Show("不可上传空文件");
+                }
+                else
+                {
+                    string info = string.Join(SEPARATOR + "", new string[] { MessageType.FileMessage + "", COMPUTER_NAME, IP_ADDRESS, Dlg.FileName, FI.Length + "" });
+                    UdpSendMessage.SendToAll(info);
+                }
             }
             else
             {
@@ -311,21 +336,21 @@ namespace GroupChat
             {
                 DateTime now = DateTime.Now;
                 DateTime fileCreateTime = Convert.ToDateTime(list_file.SelectedItems[0].SubItems[1].Text);
-                if((now-fileCreateTime).Minutes>=10)
+                if ((now - fileCreateTime).Minutes >= FILE_EXISTS_MINUTE)
                 {
                     MessageBox.Show("文件已过期");
                     list_file.Items.Remove(list_file.SelectedItems[0]);
                     return;
                 }
-                DialogResult result = MessageBox.Show("确定接收文件（"+list_file.SelectedItems[0].Text+"）吗？","tips",MessageBoxButtons.YesNo,MessageBoxIcon.Question);
+                DialogResult result = MessageBox.Show("确定接收文件（" + list_file.SelectedItems[0].Text + "）吗？", "tips", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
                     string ipAddress = list_file.SelectedItems[0].SubItems[3].Text;
                     string filePath = list_file.SelectedItems[0].SubItems[0].Text;
                     string fileSize = list_file.SelectedItems[0].SubItems[2].Text;
-                    
-                    string info = string.Join(SEPARATOR+"",new string[]{MessageType.FileRequest+"",IP_ADDRESS,filePath,fileSize});
-                    UdpSendMessage.SendToOne(ipAddress,info);
+
+                    Transmission receiveForm = new Transmission(ipAddress, filePath, fileSize);
+                    receiveForm.Show();
                 }
                 else
                 {
@@ -338,7 +363,7 @@ namespace GroupChat
             }
         }
 
-    
+
 
     }
 }

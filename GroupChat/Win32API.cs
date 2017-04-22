@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Net.Sockets;
 
 namespace GroupChat
 {
@@ -15,6 +16,7 @@ namespace GroupChat
         //封装字符串以便传输
         public struct My_lParam
         {
+            public Socket t;
             public string s;
         }
        

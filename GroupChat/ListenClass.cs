@@ -75,44 +75,7 @@ namespace GroupChat
                         }
                         break;
 
-                    case MessageType.FileRequest:
-                        {
-                            string ipAddress = infos[1];
-                            string filePath = infos[2];
-                            string fileSize = infos[3];
-                            if (File.Exists(filePath))
-                            {
-                                Thread sendFileThread = new Thread(new ParameterizedThreadStart(SendFileClass.SendFile));
-                                sendFileThread.Start(filePath);
-                            }
-                            else
-                            {
-                                fileSize = "0";
-                            }
-
-                            string myInfo = string.Join(ChatRoom.SEPARATOR + "", new string[] { MessageType.FileRequestReply + "", ChatRoom.IP_ADDRESS, filePath, fileSize });
-                            UdpSendMessage.SendToOne(ipAddress, myInfo);
-                        }
-                        break;
-
-                    case MessageType.FileRequestReply:
-                        {
-                            string ipAddress = infos[1];
-                            string filePath = infos[2];
-                            string fileSize = infos[3];
-                            if (fileSize == "0")
-                            {
-                                MessageBox.Show("文件(" + filePath + ")已不存在，无法传输");
-                            }
-                            else
-                            {
-                                Win32API.My_lParam lp = new Win32API.My_lParam();
-                                lp.s = string.Join(ChatRoom.SEPARATOR + "", new string[] { ipAddress, filePath, fileSize });
-                                Win32API.SendMessage(charRoom, (int)MessageType.FileRequestReply, 0, ref lp);
-                            }
-                        }
-                        break;
-
+                 
                     default:
 
                         break;

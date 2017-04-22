@@ -15,3 +15,11 @@ F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\Gr
 F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.pdb
 F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.csprojResolveAssemblyReference.cache
 F:\desktop\code\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.ChatRoom.resources
+F:\lan\Documents\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.exe
+F:\lan\Documents\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.pdb
+F:\lan\Documents\Visual Studio 2010\Projects\GroupChat\GroupChat\bin\Debug\GroupChat.exe
+F:\lan\Documents\Visual Studio 2010\Projects\GroupChat\GroupChat\bin\Debug\GroupChat.pdb
+F:\lan\Documents\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.ChatRoom.resources
+F:\lan\Documents\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.Transmission.resources
+F:\lan\Documents\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.Properties.Resources.resources
+F:\lan\Documents\Visual Studio 2010\Projects\GroupChat\GroupChat\obj\x86\Debug\GroupChat.csproj.GenerateResource.Cache
