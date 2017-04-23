@@ -19,7 +19,7 @@ namespace GroupChat
             public Socket t;
             public string s;
         }
-       
+
         //同步发送消息
         [DllImport("User32.dll", EntryPoint = "SendMessage")]
         public static extern int SendMessage(

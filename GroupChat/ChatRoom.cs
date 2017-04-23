@@ -19,7 +19,8 @@ namespace GroupChat
     enum MessageType
     {
         WM_USER = 0x0400,//系统自定义消息0x0000~0x0400 
-        Broadcast, BroadcastReply, ChatMessage, FileMessage, FileRequest, ClearUsers, UpdateProgressBar, FileReceiveSuccess, FileReceiveError
+        Broadcast, BroadcastReply, ChatMessage, FileMessage, FileRequest,
+        ClearUsers, UpdateProgressBar, FileReceiveSuccess, FileReceiveError, ShowWindow
     }
 
     public partial class ChatRoom : Form
@@ -36,7 +37,7 @@ namespace GroupChat
         public static readonly string COMPUTER_NAME = Dns.GetHostName();
         public static readonly string IP_ADDRESS = GetInternalIP();
         public static readonly string DOWNLOAD_DIR = @".\Downloads";
-       
+
         //获取内网IP
         public static string GetInternalIP()
         {
@@ -68,10 +69,11 @@ namespace GroupChat
         private ChatRoom()
         {
             InitializeComponent();
+            this.StartPosition = FormStartPosition.CenterScreen;
             SendFileClass.Initialize(sendFileSocket, tcpPoint);
         }
 
-        public static ChatRoom GetRoom()
+        public static Form GetRoom()
         {
             //多线程同时运行到这里，会同时通过这个判断条件执行条件内的代码
             if (chatRoom == null)
@@ -79,11 +81,17 @@ namespace GroupChat
                 //多线程同时运行到这里后，只能有一个线程通过lock锁，其他线程会被挂起
                 lock (locker)
                 {
-                    // 再次判断如果类的实例是否创建，如果不存在则实例化，反之就直接输出类的实例
+                    // 判断是否已存在群聊进程，是则激活并结束当前进程，否则启动群聊窗口
+                    IntPtr handle = Win32API.FindWindow(null, WINDOWS_NAME);
+                    if (handle != IntPtr.Zero)
+                    {
+                        Win32API.SendMessage(handle, (int)MessageType.ShowWindow, 0, 0);
+                        Process.GetCurrentProcess().Kill();
+                    }
+                    //保证群聊窗口唯一
                     if (chatRoom == null)
                     {
                         chatRoom = new ChatRoom();
-
                     }
                 }
             }
@@ -164,7 +172,7 @@ namespace GroupChat
                         Socket sendFileAccept = ml.t;
 
                         byte[] reply = new byte[TCP_DATA_MAX_SIZE];
-                        
+
                         if (File.Exists(filePath))
                         {
                             reply = Encoding.Default.GetBytes("有效文件");
@@ -185,10 +193,13 @@ namespace GroupChat
                 case MessageType.ClearUsers:
                     {
                         list_user.Items.Clear();
-                        break;
                     }
-
-
+                    break;
+                case MessageType.ShowWindow:
+                    {
+                        this.Activate();
+                    }
+                    break;
 
                 default:
                     base.DefWndProc(ref m);
