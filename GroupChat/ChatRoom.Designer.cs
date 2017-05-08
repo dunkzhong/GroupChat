@@ -48,6 +48,7 @@
             // 
             // message_chat
             // 
+            this.message_chat.Font = new System.Drawing.Font("微软雅黑", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.message_chat.Location = new System.Drawing.Point(219, 310);
             this.message_chat.Name = "message_chat";
             this.message_chat.Size = new System.Drawing.Size(494, 131);
@@ -56,7 +57,7 @@
             // 
             // btn_send
             // 
-            this.btn_send.Location = new System.Drawing.Point(363, 447);
+            this.btn_send.Location = new System.Drawing.Point(553, 447);
             this.btn_send.Name = "btn_send";
             this.btn_send.Size = new System.Drawing.Size(120, 38);
             this.btn_send.TabIndex = 1;
@@ -77,7 +78,7 @@
             // 
             // btn_quit
             // 
-            this.btn_quit.Location = new System.Drawing.Point(527, 447);
+            this.btn_quit.Location = new System.Drawing.Point(244, 447);
             this.btn_quit.Name = "btn_quit";
             this.btn_quit.Size = new System.Drawing.Size(120, 38);
             this.btn_quit.TabIndex = 2;
@@ -87,11 +88,12 @@
             // 
             // record_chat
             // 
+            this.record_chat.Font = new System.Drawing.Font("微软雅黑", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.record_chat.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-            this.record_chat.Location = new System.Drawing.Point(219, 42);
+            this.record_chat.Location = new System.Drawing.Point(219, 19);
             this.record_chat.Name = "record_chat";
             this.record_chat.ReadOnly = true;
-            this.record_chat.Size = new System.Drawing.Size(494, 244);
+            this.record_chat.Size = new System.Drawing.Size(494, 267);
             this.record_chat.TabIndex = 4;
             this.record_chat.Text = "";
             // 

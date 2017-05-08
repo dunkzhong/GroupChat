@@ -28,7 +28,7 @@ namespace GroupChat
 
         public static readonly int FILE_EXISTS_MINUTE = 10;
         public static readonly int UDP_DATA_MAX_SIZE = 1024;
-        public static readonly int TCP_DATA_MAX_SIZE = 100 * 1024 * 1024;
+        public static readonly int TCP_DATA_MAX_SIZE = 10 * 1024 * 1024;
         public static readonly int TCP_LISTEN_MAX_SIZE = 1024;
         public static readonly int LISTEN_PORT = 2048;
         public static readonly int FILE_PORT = 2049;
@@ -130,11 +130,28 @@ namespace GroupChat
                         string owner = msg[0] + "(" + msg[1] + ")";
                         string updateTime = DateTime.Now + "";
                         string data = msg[2];
+
                         string str = owner;
-                        str += updateTime + Environment.NewLine;
-                        str += data + Environment.NewLine;
+                        str += updateTime;
+
+                        int headLength = str.Length;
+
                         str += Environment.NewLine;
+                        str += data;
+                        str += Environment.NewLine;
+                        str += Environment.NewLine;
+
+                        int newRecordStart = record_chat.TextLength;
+
                         record_chat.AppendText(str);
+
+                        record_chat.Select(newRecordStart, headLength);
+                        record_chat.SelectionColor = Color.Blue;
+
+                        record_chat.Select(record_chat.TextLength, 0);
+                        record_chat.Focus();
+
+                        message_chat.Focus();
                     }
                     break;
 
@@ -143,21 +160,35 @@ namespace GroupChat
                         Win32API.My_lParam ml = new Win32API.My_lParam();
                         Type t = ml.GetType();
                         ml = (Win32API.My_lParam)m.GetLParam(t);
-
                         string[] msg = ml.s.Split(SEPARATOR);
+
                         string owner = msg[0] + "(" + msg[1] + ")";
                         string updateTime = DateTime.Now + "";
                         string filePath = msg[2];
                         string fileSize = msg[3];
 
                         string str = owner;
-                        str += updateTime + Environment.NewLine;
+                        str += updateTime;
+
+                        int headLength = str.Length;
+
+                        str += Environment.NewLine;
                         str += "发送文件：" + Path.GetFileName(filePath);
                         str += "；大小(字节)：" + fileSize;
                         str += Environment.NewLine;
                         str += Environment.NewLine;
 
+                        int newRecordStart = record_chat.TextLength;
+                        
                         record_chat.AppendText(str);
+
+                        record_chat.Select(newRecordStart, headLength);
+                        record_chat.SelectionColor = Color.Blue;
+
+                        record_chat.Select(record_chat.TextLength,0);
+                        record_chat.Focus();
+
+                        message_chat.Focus();
 
                         updateFileList(filePath, updateTime, fileSize, msg[1]);
                     }
@@ -312,7 +343,6 @@ namespace GroupChat
                 UdpSendMessage.SendToAll(info);
             }
             message_chat.Clear();
-            message_chat.Focus();
         }
 
         private void btn_upload_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
